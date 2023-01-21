@@ -1,0 +1,64 @@
+package tournament
+
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"strings"
+)
+
+type Team struct {
+	name string;
+	mp, w, d, l, p int;
+}
+
+func Tally(reader io.Reader, writer io.Writer) error {
+	teams := []Team{}
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		ttt := scanner.Text()
+		fmt.Println(ttt)
+		res := strings.Split(ttt, ";")
+		t1, t2 := -1, -1
+		for i, val := range teams {
+			if val.name == res[0] {
+				t1 = i
+			}
+			if val.name == res[1] {
+				t2 = i
+			}
+		}
+		if t1 == -1 {
+			teams = append(teams, Team{})
+			t1 = len(teams) - 1
+			teams[t1].name = res[0]
+		}
+		fmt.Println(t1, teams[t1].name, res[0])
+		if t2 == -1 {
+			teams = append(teams, Team{})
+		fmt.Println(t2)
+			t2 = len(teams) - 1
+			teams[t2].name = res[1]
+		}
+		switch res[2] {
+		case "win":
+			teams[t1].w++
+			teams[t1].p += 3
+			teams[t2].l++
+		case "lose":
+			teams[t1].l++
+			teams[t2].w++
+			teams[t2].p += 3
+		case "draw":
+			teams[t1].d++
+			teams[t1].p++
+			teams[t2].d++
+			teams[t2].p++
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("reading standard input:", err)
+	}
+	return nil
+}
